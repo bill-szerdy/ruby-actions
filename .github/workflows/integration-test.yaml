@@ -1,0 +1,31 @@
+name: 'Scout integration tests'
+on: push
+jobs:
+  run-tests:
+    runs-on: ubuntu-20.04
+    
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      # - name: Init and install build package
+      #   run: apt-get update && apt-get install build-essential -y
+
+      # - name: Set environment variables
+      #   run: echo "SCOUT_ENV=development" >> $GITHUB_ENV
+      #        echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true 
+      
+      - name: Connect to redis
+        run: ruby redis-test.rb
